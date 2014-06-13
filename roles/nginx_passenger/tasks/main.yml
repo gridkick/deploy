@@ -1,0 +1,49 @@
+---
+- name: update apt
+  apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
+
+- name: Install Passenger requirements
+  apt:  pkg=libcurl4-openssl-dev state=present
+  sudo: yes
+
+- name: install passenger gem
+  # gem: name=passenger version=$passenger_gem_version state=present
+  shell: bash -l -c 'gem install passenger --no-ri --no-rdoc -v"$passenger_gem_version"' creates=~/.rvm/gems/$ruby_version/gems/passenger-$passenger_gem_version
+
+- name: install patched nginx via passenger
+  shell: bash -l -c 'rvmsudo passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --extra-configure-flags=none' creates=/opt/nginx/sbin/nginx
+
+- name: copy nginx conf
+  template: src=nginx.conf.j2 dest=/opt/nginx/conf/nginx.conf owner=root group=root
+  tags:
+    - nginx
+  sudo: yes
+
+- name: add nginx init script
+  copy: src=nginx-init dest=/etc/init.d/nginx mode=0755 owner=root group=root
+  sudo: yes
+
+- name: update nginx runlevels
+  command: update-rc.d nginx defaults
+  sudo: yes
+
+- name: setup nginx host file dirs
+  file: name=/etc/nginx/{{ item }} state=directory owner=root group=root
+  sudo: yes
+  with_items:
+    - sites-available
+    - sites-enabled
+
+- name: restart nginx
+  service: name=nginx state=restarted enabled=yes
+  tags:
+    - nginx
+  sudo: yes
+
+- name: open ports in firewall
+  command: ufw allow {{ item }}
+  sudo: yes
+  with_items:
+    - http
+    - https

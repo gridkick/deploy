@@ -1,0 +1,88 @@
+---
+- name: Ensure common packages are installed
+  apt:  pkg={{ item }} state=installed update_cache=yes cache_valid_time=3600
+  with_items:
+    - python-pycurl
+  sudo: true
+  tags:
+    - postgresql
+    
+- name: inlcude ubuntu postgresql ppa tasks
+  include: ubuntu.yml
+  when: not "{{ ansible_distribution }}" != "Ubuntu"
+
+- name: install postgresql packages
+  sudo: yes
+  apt:  pkg={{ item }} state=present force=yes update_cache=yes
+  with_items:
+    - postgresql-client-{{ postgresql.version }}
+    - postgresql-{{ postgresql.version }}
+    - python-psycopg2
+  tags:
+    - postgresql  
+    
+- name: template over the postgresql.conf
+  sudo: yes
+  template: src=postgresql.conf.j2 dest="/etc/postgresql/{{ postgresql.version }}/main/postgresql.conf" owner=postgres group=postgres mode=0640
+  tags: 
+    - postgresql
+
+- name: restart postgresql
+  sudo: true
+  service: name=postgresql state=restarted
+      
+- name: add default user
+  sudo: yes
+  postgresql_user: name="{{ postgresql_user }}" password="{{ postgresql_password }}" port="{{ postgresql.app_db_port }}" role_attr_flags=SUPERUSER state=present
+  sudo_user: postgres
+  tags: 
+    - postgresql 
+    
+- name: setup postgresql remote connections
+  sudo: yes
+  template: src=pg_hba.conf.j2 dest="/etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf" owner=root group=root mode=0644
+  tags: 
+    - postgresql
+
+- name: restart postgresql
+  sudo: true
+  service: name=postgresql state=restarted
+  
+- name: postgresql dev headers
+  sudo: yes
+  apt:  pkg=libpq-dev state=present
+  when: postgresql.dev_headers
+  tags:
+    - postgresql
+
+- name: restart postgresql
+  sudo: true
+  service: name=postgresql state=restarted
+      
+- name: postgresql contribs/hstore
+  sudo: yes
+  apt:  pkg="postgresql-contrib-{{ postgresql.version }}" state=present
+  when: postgresql.hstore
+  tags:
+    - postgresql
+
+- name: restart postgresql
+  sudo: true
+  service: name=postgresql state=restarted
+  
+- name: postgis extension
+  sudo: yes
+  apt: pkg={{ item }}
+  with_items:
+    - "postgresql-{{ postgresql.version }}-postgis-{{ postgresql.gis_version }}"
+    - libgeos-c1
+  tags:
+    - postgresql
+
+- name: restart postgresql
+  sudo: true
+  service: name=postgresql state=restarted
+  
+- name: ensure postgresql is running and enabled
+  sudo: yes
+  service: name=postgresql state=running enabled=yes

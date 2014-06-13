@@ -1,0 +1,11 @@
+---
+
+postgresql: 
+  backup_service: postgresql
+  app_db_port: 9181
+  version: 9.2
+  hstore: true
+  gis: true
+  gis_version: 2.1
+  dev_headers: true
+  

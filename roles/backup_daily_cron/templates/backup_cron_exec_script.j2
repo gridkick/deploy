@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+export HOME=${HOME:-"/home/`whoami`"}
+source ~/.bash_profile
+export PATH="$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin"
+
+## Debug
+#
+# Use this to modify the path and allow the backup gem to
+# trigger error/warning emails
+#
+# Change the path in quotes in the `awk` command below
+#
+# export PATH=$(echo $PATH | tr ':' '\n' | awk '$0 !~ "/usr/bin"' | paste -sd:)
+
+exec backup perform -t {{ backup_service }}_backup

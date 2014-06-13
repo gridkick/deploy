@@ -1,0 +1,10 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+App.seeds[ 'ansible' ] =
+  {
+    'ansible_ssh_port'             => 42700,
+    'ansible_ssh_private_key_file' => '~/.vagrant.d/insecure_private_key',
+    'ansible_ssh_user'             => 'vagrant',
+    'app_environment'              => 'development'
+  }

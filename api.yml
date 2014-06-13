@@ -1,0 +1,16 @@
+---
+- name: API server
+  hosts: api
+  user: ubuntu
+  roles:
+    - common
+    - ruby
+    - nginx_passenger
+    - gridkick_ssl_setup
+    - adventure_api_ssl_setup
+    - api_nginx_hosts
+    - api_capistrano_setup
+    - api_ruby_dependencies
+    - ansible
+    - deploy_capistrano_setup
+    - api_ansible_keys

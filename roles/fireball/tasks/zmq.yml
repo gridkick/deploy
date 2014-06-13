@@ -1,0 +1,16 @@
+---
+- name: download tarball
+  get_url: url=http://download.zeromq.org/zeromq-3.2.2.tar.gz dest=/tmp/zeromq-3.2.2.tar.gz
+
+- name: unpack tarball
+  command: tar -xzf /tmp/zeromq-3.2.2.tar.gz chdir=/tmp creates=/tmp/zeromq-3.2.2
+
+- name: install 0mq
+  command: $item chdir=/tmp/zeromq-3.2.2 creates=/usr/local/include/zmq.h
+  with_items:
+    - ./configure
+    - make
+    - make install
+
+- name: ldconfig
+  command: ldconfig

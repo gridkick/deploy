@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+root = File.expand_path File.join( File.dirname( __FILE__ ) , '../..' )
+load "#{ root }/lib/app.rb"
+
+App.load_seeds!
+
+command  = 'ansible-playbook'
+hosts    = "#{ root }/hosts/db_images.hosts"
+playbook = "#{ root }/daily_backups_prep.yml"
+
+extra_vars =
+  App.seeds[ 'daily_backups_prep' ].map do | k , v |
+    "#{ k }=#{ v }"
+  end.join ' '
+
+to_run = <<CMD
+ansible-playbook \
+  #{ playbook } \
+  -i #{ hosts } \
+  --extra-vars '#{ extra_vars }'
+CMD
+
+exec to_run

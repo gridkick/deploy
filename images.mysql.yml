@@ -1,0 +1,15 @@
+---
+- name: Image::Mysql Server - prepared for backups
+  hosts: mysql
+  user: ubuntu
+  vars_files:
+    - vars/mysql.yml
+    - vars/secrets.yml
+  roles:
+    - common
+    - common_service_security
+    - common_ssh_authorized_keys
+    - mysql
+    - backup_user
+
+- include: daily_backups_prep.yml

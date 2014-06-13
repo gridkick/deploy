@@ -1,0 +1,6 @@
+---
+- name: Prepare base digital ocean boxes with ubuntu user
+  hosts: change-ubuntu
+  user: root
+  roles: 
+    - common_user_ubuntu

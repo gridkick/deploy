@@ -1,0 +1,16 @@
+---
+- name: Image::Postgresql Server - prepared for backups
+  hosts: postgresql
+  user: ubuntu
+  vars_files:
+    - vars/postgresql.yml
+    - vars/secrets.yml
+  roles:
+    - common
+    - { role: common_service_security, allow_port: "{{ postgresql.app_db_port }}" }
+    - common_ssh_authorized_keys
+    - common_locale
+    - postgresql
+    - backup_user
+
+- include: daily_backups_prep.yml

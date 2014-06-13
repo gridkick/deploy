@@ -1,0 +1,10 @@
+---
+- name: install backup gem configuration
+  template: src={{ backup_service }}_backup.rb.j2 
+            dest=/home/{{ ansible_ssh_user }}/Backup/models/{{ backup_service }}_backup.rb
+
+- name: run backup to catch errors early (but don't wait for it to finish)
+  shell: bash -l -c 'backup perform -t {{ backup_service }}_backup'
+  ignore_errors: yes
+  async: 600
+  poll: 0

@@ -1,0 +1,27 @@
+---
+- name: stop redis
+  sudo: yes
+  service:  name=redis 
+            state=stopped
+
+- name: /etc/redis/redis.conf | change password
+  sudo: yes
+  action: lineinfile 
+          dest=/etc/redis/redis.conf
+          regexp="^.*requirepass\s.*"
+          line="requirepass {{ redis_password }}"
+          group=root
+
+- name: /etc/init.d/redis | change password
+  sudo: yes
+  action: lineinfile 
+          dest=/etc/init.d/redis
+          regexp="^PASSWORD=.*"
+          line="PASSWORD={{ redis_password }}"
+          state=present
+
+- name: start redis
+  sudo: yes
+  service:  name=redis 
+            state=restarted
+ 

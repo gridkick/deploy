@@ -1,0 +1,4 @@
+---
+mysql:
+  version: 5.5.34-0ubuntu0.12.04.1
+  app_port_db: 9191

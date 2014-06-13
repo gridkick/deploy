@@ -1,0 +1,15 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+App.seeds[ 'api' ] =
+  {
+    'ansible_ssh_port'               => 42400,
+    'ansible_ssh_private_key_file'   => '~/.vagrant.d/insecure_private_key',
+    'ansible_ssh_user'               => 'vagrant',
+    'app_environment'                => 'development',
+    'app_iam_access_key_id'          => 'abc123',
+    'app_iam_secret_access_key'      => 'abc123',
+    'backup_notifier_mail_user_name' => 'email@example.com',
+    'backup_notifier_mail_password'  => 'abc123', 
+    'vagrant_ip_address'             => '192.168.211.218'
+  }

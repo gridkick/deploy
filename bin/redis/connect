@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+root = File.expand_path File.join( File.dirname( __FILE__ ) , '../..' )
+load "#{ root }/lib/app.rb"
+
+App.load_seeds!
+
+port = App.seeds[ 'redis' ][ 'vm_db_forwarded_port' ]
+
+to_run = <<CMD
+redis-cli \
+  -h 127.0.0.1 \
+  -p #{ port }
+CMD
+
+exec to_run

@@ -1,0 +1,6 @@
+---
+- name: Server with Ansible installed
+  hosts: all
+  roles:
+    - common
+    - ansible

@@ -1,0 +1,28 @@
+--- 
+
+- name: ensure current credentials work
+  command: mongo  {{ db_name }}
+                  --port {{ db_port }}
+                  --username  {{ db_username }}
+                  -p {{ db_password }}
+                  --eval "db.auth('{{ db_username }}', '{{ db_password }}')"
+  register: command_result
+  failed_when: error_string in command_result.stdout
+                  
+- name: change password
+  command: mongo  {{ db_name }}
+                  --port {{ db_port }}
+                  --username {{ db_username }}      
+                  -p {{ db_password }}
+                  --eval "db.changeUserPassword('{{ db_username }}', '{{ new_random_password }}')"
+  register: command_result
+  failed_when: error_string in command_result.stdout
+  
+- name: ensure new credentials work
+  command: mongo  {{ db_name }}
+                  --port {{ db_port }}
+                  --username {{ db_username }}
+                  -p {{ new_random_password }}
+                  --eval "db.auth('{{ db_username }}', '{{ new_random_password }}')"
+  register: command_result
+  failed_when: error_string in command_result.stdout

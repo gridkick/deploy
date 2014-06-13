@@ -1,0 +1,32 @@
+---
+- name: install backup gem prerequisites
+  apt: pkg={{ item }} state=present
+  sudo: yes
+  with_items:
+    - libxml2-dev
+    - libxslt1-dev
+
+- name: install backup gem
+  # gem: name=backup version=$backup_gem_version state=present
+  shell:  bash -l -c 'gem install backup --no-ri --no-rdoc -v"{{backup_gem_version}}"' 
+          creates="/home/{{ backup_user }}/.rvm/gems/{{ ruby_version }}/gems/backup-{{ backup_gem_version }}"
+
+- name: ensure backup models directory is present
+  sudo: yes
+  file: path=/home/{{ backup_user }}/Backup 
+        state=directory
+        owner={{ backup_user }}
+        group={{ backup_user }}
+        
+
+- name: ensure backup models directory is present
+  sudo: yes
+  file: path=/home/{{ backup_user }}/Backup/models 
+        state=directory
+        owner={{ backup_user }}
+        group={{ backup_user }}
+
+- name: copy backup config
+  sudo: yes
+  copy: src=config.rb 
+        dest="/home/{{ backup_user }}/Backup/config.rb"

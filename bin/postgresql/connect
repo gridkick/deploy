@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+root = File.expand_path File.join( File.dirname( __FILE__ ) , '../..' )
+load "#{ root }/lib/app.rb"
+
+App.load_seeds!
+
+password = App.seeds[ 'postgresql' ][ 'app_db_password' ]
+port     = App.seeds[ 'postgresql' ][ 'vm_db_forwarded_port' ]
+user     = App.seeds[ 'postgresql' ][ 'app_db_username' ]
+
+to_run = <<CMD
+psql \
+  -h 127.0.0.1 \
+  -p #{ port } \
+  -U #{ user } \
+  -W postgres
+CMD
+
+puts <<___
+====================================
+PSQL PASSWORD: #{ password }
+====================================
+
+___
+
+exec to_run

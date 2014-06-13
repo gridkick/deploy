@@ -1,0 +1,7 @@
+---
+- include: core.yml
+
+# - name: local dev environment
+#   hosts: all
+#   roles:
+#     - lo

@@ -1,0 +1,28 @@
+---
+- name: update apt
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: install dependencies for (python) 0mq libs
+  apt: pkg={{ item }} state=present
+  with_items:
+    - build-essential
+    - python-setuptools
+    - gcc
+    - libtool
+    - autoconf
+    - automake
+    - uuid-dev
+    - python-dev
+
+- include: zmq.yml
+
+- name: install pip
+  easy_install: name=pip
+
+- name: install python 0mq packages
+  pip: name={{ item }} state=present
+  with_items:
+    - pyzmq
+    - pyasn1
+    - PyCrypto
+    - python-keyczar version=0.71c

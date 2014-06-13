@@ -1,0 +1,15 @@
+---
+- name: Image::Redis Server - prepared for backups
+  hosts: redis
+  user: ubuntu
+  vars_files:
+    - vars/redis.yml
+    - vars/secrets.yml
+  roles:
+    - common
+    - common_ssh_authorized_keys
+    - { role: common_service_security, allow_port: "{{ redis.app_db_port }}" }
+    - redis
+    - backup_user
+
+- include: daily_backups_prep.yml

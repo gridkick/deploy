@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+old_ifs="$IFS"
+IFS='/'
+path=( $0 )
+len=${#path[@]}
+bin_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+script="__${path[len-1]}__"
+full_script="$bin_dir/$script"
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+dir_array=( $script_dir )
+len=${#dir_array[@]}
+service="${dir_array[len-1]}"
+
+export IFS="$old_ifs"
+exec "$full_script" "$service" "$@"

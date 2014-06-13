@@ -1,0 +1,22 @@
+---
+- name: install whenever gem
+  # gem: name=whenever version=$whenever_gem_version state=present
+  shell: bash -l -c 'gem install whenever --no-ri --no-rdoc -v"$whenever_gem_version"' creates=~/.rvm/gems/$ruby_version/gems/whenever-$whenever_gem_version
+
+- name: create home bin directory
+  file: path=~/bin state=directory
+
+- name: setup backup cron exec script
+  template: src=backup_cron_exec_script.j2 dest=~/bin/{{ item }}_backup mode=0755
+  with_items:
+    - mongo
+    - redis
+
+- name: create required whenever directories
+  file: path=~/whenever/config state=directory
+
+- name: place whenever schedule
+  template: src=whenever_schedule.rb.j2 dest=~/whenever/config/schedule.rb
+
+- name: update crontab for whenever
+  shell: bash -l -c 'whenever --update-crontab' chdir=~/whenever

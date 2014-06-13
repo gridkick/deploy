@@ -1,0 +1,36 @@
+---
+- name: update apt
+  sudo: yes
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: install ansible/pip/etc... dependencies
+  apt: pkg={{ item }} state=present
+  sudo: yes
+  with_items:
+    - git-core
+    - python-setuptools
+    - python-dev
+  
+- name: install pip
+  sudo: yes
+  easy_install: name=pip
+
+- name: install ansible python deps
+  sudo: yes
+  pip:  name={{ item }} 
+        state=present 
+        extra_args="--no-use-wheel"
+  with_items:
+    - paramiko
+    - PyYAML
+    - Jinja2
+
+- name: install ansible
+  sudo: yes
+  pip: name=ansible
+       version={{ ansible_version }}
+       extra_args="--no-use-wheel"
+
+- name: copy over .ansible.cfg file
+  copy: src=ansible.cfg dest=~/.ansible.cfg
+  

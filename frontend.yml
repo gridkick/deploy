@@ -1,0 +1,13 @@
+---
+- name: Frontend web server
+  hosts: frontend
+  user: ubuntu
+  roles:
+    - common
+    - ruby
+    - nginx_passenger
+    - gridkick_ssl_setup
+    - adventure_frontend_ssl_setup
+    - frontend_nginx_hosts
+    - frontend_capistrano_setup
+    - javascript_runtime

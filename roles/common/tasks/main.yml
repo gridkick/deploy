@@ -1,0 +1,33 @@
+---
+- name: update apt
+  sudo: yes
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: install prerequisites
+  sudo: yes
+  apt: pkg={{ item }} state=present
+  with_items:
+    - curl
+    - git
+    - screen
+    - subversion
+    - traceroute
+    - vim
+    - build-essential
+
+- name: make sure cron is running
+  sudo: yes
+  service: name=cron state=started
+
+- include: postfix.yml
+
+- name: enable ssh
+  sudo: yes
+  command: ufw allow ssh
+  
+- name: turn on firewall (but don't wait for it to finish)
+  sudo: yes
+  command: ufw enable
+  ignore_errors: yes
+  async: 60
+  poll: 0

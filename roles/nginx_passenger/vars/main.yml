@@ -1,0 +1,4 @@
+---
+nginx_worker_processes: 2
+passenger_gem_version: 4.0.35
+ruby_version: ruby-2.0.0-p353

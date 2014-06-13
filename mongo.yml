@@ -1,0 +1,16 @@
+---
+- name: Mongo server with daily backups configured
+  hosts: mongo
+  user: ubuntu
+  vars_files:
+    - vars/mongo.yml
+    - vars/secrets.yml
+  roles:
+    - common
+    - pip
+    - { role: common_service_security, allow_port: "{{ mongo.app_db_port }}" }
+    - common_ssh_authorized_keys
+    - mongo
+    - ruby
+    - backup_user
+    - backup_system

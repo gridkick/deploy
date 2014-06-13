@@ -1,0 +1,5 @@
+---
+- name: Add backup_user and westonplatter@gmail.com ssh key
+  hosts: all
+  roles:
+    - backup_user

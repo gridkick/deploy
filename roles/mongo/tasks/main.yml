@@ -1,0 +1,120 @@
+---
+- name: Add 10gen key
+  sudo: yes
+  apt_key: id=7F0CEB10 url="http://docs.mongodb.org/10gen-gpg-key.asc" state=present
+
+- name: Copy 10gen.list to /etc/apt/sources.list.d
+  sudo: yes
+  copy: src=10gen.list dest=/etc/apt/sources.list.d/10gen.list
+
+- name: update apt-get
+  sudo: yes
+  apt:  update_cache=yes
+
+- name: ensure apt_repository requirements met
+  sudo: yes
+  apt:  pkg=python-software-properties
+
+- name: install mongodb
+  sudo: yes
+  apt:  pkg=mongodb-10gen={{ mongo.version }} 
+        update_cache=yes
+
+- name: install pymongo dependencies
+  sudo: yes
+  apt:  pkg={{ item }}
+  with_items:
+    - build-essential
+    - python-dev
+
+- name: install mongodb_user module dependencies
+  sudo: yes
+  pip:  name=pymongo version=2.5
+
+- name: check if root user already present
+  register: mongo_root_status
+  ignore_errors: yes
+  tags:
+    - mongo
+  command: mongo  --port {{ mongo.app_db_port }} 
+                  --username {{ mongo_root_username }} 
+                  -p {{ mongo_root_password }} 
+                  --eval "version()" admin
+
+- name: create default admin user with all roles
+  when: mongo_root_status.rc != 0
+  tags:
+    - mongo
+  mongodb_user: database=admin
+                user={{ mongo_root_username }}
+                password={{ mongo_root_password }}
+                roles={{ mongo.root_roles }}
+                state=present
+
+- name: ensure default admin user with all roles
+  when: mongo_root_status.rc == 0
+  tags:
+    - mongo
+  mongodb_user: database=admin
+                login_user={{ mongo_root_username }}
+                login_password={{ mongo_root_password }}
+                login_port={{ mongo.app_db_port }}
+                user={{ mongo_root_username }}
+                password={{ mongo_root_password }}
+                roles={{ mongo.root_roles }}
+                state=present
+
+# comment out app specific db
+# 
+# - name: check if default app user already present
+#   register: mongo_user_status
+#   ignore_errors: yes
+#   tags:
+#     - mongo
+#   command: mongo  --port {{ mongo.app_db_port }} 
+#                   --username {{ mongo.app_db_username }} 
+#                   -p {{ mongo_app_db_password }} 
+#                   --eval "version()" {{ mongo.app_db_name }}
+
+# - name: create default user with all roles
+#   when: mongo_user_status.rc != 0
+#   tags:
+#     - mongo
+#   mongodb_user: database={{ mongo.app_db_name }}
+#                 user={{ mongo.app_db_username }}
+#                 password={{ mongo_app_db_password }}
+#                 roles={{ mongo.app_db_roles }}
+#                 state=present
+
+# - name: ensure default user with db only roles
+#   when: mongo_user_status.rc == 0
+#   tags:
+#     - mongo
+#   mongodb_user: database={{ mongo.app_db_name }}
+#                 login_user={{ mongo_root_username }}
+#                 login_password={{ mongo_root_password }}
+#                 login_port={{ mongo.app_db_port }}
+#                 user={{ mongo.app_db_username }}
+#                 password={{ mongo_app_db_password }}
+#                 roles={{ mongo.app_db_roles }}
+#                 state=present
+                
+# - name: ensure admin user with all roles for app database
+#   when: mongo_user_status.rc == 0
+#   tags:
+#     - mongo
+#   mongodb_user: database={{ mongo.app_db_name }}
+#                 login_user={{ mongo_root_username }}
+#                 login_password={{ mongo_root_password }}
+#                 login_port={{ mongo.app_db_port }}
+#                 user={{ mongo_root_username }}
+#                 password={{ mongo_root_username }}
+#                 roles={{ mongo.root_roles }}
+
+- name: update mongodb conf
+  sudo: yes
+  template: src=mongodb.conf.j2 dest=/etc/mongodb.conf owner=root group=root
+
+- name: restart service
+  sudo: yes
+  service: name=mongodb state=restarted

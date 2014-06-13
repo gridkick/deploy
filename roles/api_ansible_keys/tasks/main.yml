@@ -1,0 +1,18 @@
+---
+- name: create expected capistrano dirs
+  sudo: yes
+  file: name={{ keys_dir }}
+        state=directory
+        owner={{ ansible_ssh_user }}
+        group={{ ansible_ssh_user }}
+  tags:
+    - keys
+    - deploy
+
+- name: copy expected keys to directory
+  copy: src=backup@gridkick.com
+        dest={{ keys_dir }}
+        mode=600
+  tags:
+    - keys
+    - deploy

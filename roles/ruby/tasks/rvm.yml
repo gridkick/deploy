@@ -1,0 +1,37 @@
+---
+- name: install rvm stable
+  shell: bash -l -c "curl -L https://get.rvm.io | bash -s stable --autolibs=packages" creates="/home/{{ ruby_user | default(ansible_ssh_user) }}/.rvm"
+
+# rvmsudo was hanging, therefore moved to manual package install
+# 
+# Current requirements:
+# gawk libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake libtool bison pkg-config libffi-dev libreadline6-dev zlib1g-dev libssl-dev
+# - name: install rvm requirements
+#   shell: bash -l -c 'rvmsudo rvm requirements'
+
+- name: manually install rvm requirements
+  sudo: yes
+  apt: name={{ item }} state=present
+  with_items: 
+    - gawk
+    - libyaml-dev
+    - libsqlite3-dev
+    - sqlite3
+    - autoconf
+    - libgdbm-dev
+    - libncurses5-dev
+    - automake
+    - libtool
+    - bison
+    - pkg-config
+    - libffi-dev
+    - libreadline6-dev
+    - zlib1g-dev
+    - libssl-dev
+
+- name: install Nokogiri prerequisites
+  apt: pkg={{ item }} state=present
+  sudo: yes
+  with_items:
+    - libxml2-dev
+    - libxslt1-dev

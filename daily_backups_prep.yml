@@ -1,0 +1,8 @@
+---
+- name: Prepare for daily backups
+  hosts: all:!services-all
+  user: gridkickbackup
+  roles:
+    - common
+    - ruby
+    - backup_system

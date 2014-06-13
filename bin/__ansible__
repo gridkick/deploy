@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+service = ARGV[ 0 ] or
+  raise ArgumentError.new( 'need to pass service name in as CLI argument' )
+
+options = Hash.new
+
+OptionParser.new do | opts |
+  opts.on '-t' , '--tags TAGS' , 'Tags' do | tags |
+    options[ :tags ] = tags
+  end
+end.parse!
+
+root = File.expand_path File.join( File.dirname( __FILE__ ) , '..' )
+load "#{ root }/lib/app.rb"
+
+App.load_seeds!
+
+command  = 'ansible-playbook'
+hosts    = "#{ root }/hosts/local.hosts"
+playbook = "#{ root }/#{ service }.yml"
+
+extra_vars =
+  App.seeds[ service ].map do | k , v |
+    next if k == 'ansible_ssh_port'
+    "#{ k }=#{ v }"
+  end.join ' '
+
+to_run = [
+  "ansible-playbook",
+  "#{ playbook }",
+  "-i #{ hosts }",
+  '-vvvv',
+  "--extra-vars '#{ extra_vars }'"
+]
+
+if options[ :tags ].respond_to?( :size ) and options[ :tags ].size > 0
+  to_run << %Q[--tags "#{ options[ :tags ] }"]
+end
+
+exec to_run.join( ' ' )

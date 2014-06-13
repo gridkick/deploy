@@ -1,0 +1,11 @@
+---
+mongo:  
+  backup_service: mongo
+  bind_ips: 0.0.0.0
+  app_db_port: 9171
+  root_roles: 'read,readWrite,dbAdmin,userAdmin,clusterAdmin,readAnyDatabase,readWriteAnyDatabase,userAdminAnyDatabase,dbAdminAnyDatabase'
+  version: 2.4.9
+  # app_db_name: app-awesomepp
+  # app_db_username: username-awesomepp
+  # app_db_roles: 'read,readWrite,dbAdmin,userAdmin'  
+

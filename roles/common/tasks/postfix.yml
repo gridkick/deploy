@@ -1,0 +1,11 @@
+---
+- name: copy configuration for postfix install
+  copy: src=postfix_selections dest=/tmp/postfix_selections
+
+- name: preseed configuration for postfix install
+  command: debconf-set-selections /tmp/postfix_selections
+  sudo: yes
+
+- name: install postfix
+  apt: pkg=postfix state=present
+  sudo: yes

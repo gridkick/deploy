@@ -1,0 +1,6 @@
+---
+- name: Enable daily backups on an existing database server
+  hosts: all
+  roles:
+    - service_backup
+    - backup_daily_cron

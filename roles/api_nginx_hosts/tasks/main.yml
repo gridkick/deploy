@@ -1,0 +1,27 @@
+---
+- name: copy available hosts
+  copy: src={{ item }}
+        dest=/etc/nginx/sites-available/{{ item }}
+        owner=root
+        group=root
+  sudo: yes
+  tags:
+    - nginx
+  with_items:
+    - staging-api.gridkick.com
+    - api.gridkick.com
+    - local-api.gridkick.com
+
+- name: link enabled hosts
+  file: src=/etc/nginx/sites-available/{{ item }} dest=/etc/nginx/sites-enabled/{{ item }} state=link
+  sudo: yes
+  with_items:
+    - staging-api.gridkick.com
+    - api.gridkick.com
+    - local-api.gridkick.com
+
+- name: restart nginx
+  service: name=nginx state=restarted
+  tags:
+    - nginx
+  sudo: yes

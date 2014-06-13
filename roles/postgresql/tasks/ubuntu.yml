@@ -1,0 +1,17 @@
+---
+- name: ubuntu | install python-software-properties
+  sudo: true
+  apt:  pkg=python-software-properties state=present
+
+- name: template over 
+  sudo: true
+  template: src=pgdg.list.j2 dest=/etc/apt/sources.list.d/pgdg.list
+
+- name: get postgresql public key 
+  sudo: true
+  shell: 'wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -'
+  
+- name: update apt-get
+  sudo: true
+  apt: update_cache=yes
+        

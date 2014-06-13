@@ -1,0 +1,4 @@
+---
+- name: open service port in firewall
+  command: ufw allow {{ allow_port }}
+  sudo: yes

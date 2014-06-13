@@ -1,0 +1,5 @@
+---
+
+redis:
+  app_db_port: 9161
+  bind_ip: 0.0.0.0

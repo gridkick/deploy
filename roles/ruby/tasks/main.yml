@@ -1,0 +1,5 @@
+---
+- include: rvm.yml
+
+- name: install ruby
+  shell:  bash -l -c 'rvm install --verify-downloads 1 --default {{ ruby_version }}' creates="/home/{{ ruby_user | default(ansible_ssh_user) }}/.rvm/rubies/{{ ruby_version }}"

@@ -1,0 +1,36 @@
+---
+- name: add backup group
+  sudo: true
+  group: name={{ backup_group }}
+
+- name: add user
+  sudo: true
+  user: name={{ backup_user }}
+        group={{ backup_group }}
+        shell=/bin/bash
+
+- name: set user to sudo without password
+  sudo: true
+  lineinfile: "dest=/etc/sudoers
+              regexp='%{{ backup_group }}'
+              line='%{{ backup_group }} ALL=(ALL) NOPASSWD: ALL'"
+
+- name: add public key to user authorized keys
+  sudo: true
+  authorized_key: "user={{ backup_user }}
+                  key='{{ item }}'"
+  with_file:
+    - backup@gridkick.com.pub
+    - westonplatter@gmail.com.pub
+    - flynfish@gmail.com.pub
+
+- name: allow user to ssh
+  sudo: true
+  lineinfile: "dest=/etc/ssh/sshd_config
+              regexp='AllowUsers {{ backup_user }}'
+              line='AllowUsers {{ backup_user }}'"
+
+- name: restart ssh
+  sudo: true
+  service: name=ssh 
+           state=restarted

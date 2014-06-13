@@ -1,0 +1,7 @@
+---
+  - name: add public key to user authorized keys
+    sudo: true
+    authorized_key: "user={{ ansible_ssh_user }} key='{{ item }}'"
+    with_file:
+      - westonplatter@gmail.com.pub
+      - flynfish@gmail.com.pub

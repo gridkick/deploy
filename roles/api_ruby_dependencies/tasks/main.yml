@@ -1,0 +1,7 @@
+---
+- name: install gem dependency libs
+  sudo: yes
+  apt: pkg={{ item }} state=present
+  with_items:
+    - libmysqlclient-dev
+    - libpq-dev

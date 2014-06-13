@@ -1,0 +1,16 @@
+---
+- name: Image::Mongo - prepared for backups
+  hosts: mongo
+  user: ubuntu
+  vars_files:
+    - vars/mongo.yml
+    - vars/secrets.yml
+  roles:
+    - common
+    - { role: common_service_security, allow_port: "{{ mongo.app_db_port }}" }
+    - common_ssh_authorized_keys
+    - pip
+    - mongo
+    - backup_user
+
+- include: daily_backups_prep.yml

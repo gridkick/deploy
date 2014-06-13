@@ -1,0 +1,18 @@
+---
+- name: setup ssl cert directories
+  sudo: yes
+  file: name=/opt/nginx/conf/ssl/gridkick
+        state=directory
+        owner=root
+        group=root
+
+- name: place gridkick ssl cert files
+  copy: src={{ item }}
+        dest=/opt/nginx/conf/ssl/gridkick/{{ item }}
+        owner=root
+        group=root
+  sudo: yes
+  with_items:
+    - gridkick.com-unified.crt
+    - gridkick.com.key
+

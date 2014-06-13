@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+App.ansible_seeds[ 'mysql_with_backups' ] =
+  {
+    'ansible_ssh_port'               => 42000,
+    'ansible_ssh_private_key_file'   => '~/.vagrant.d/insecure_private_key',
+    'ansible_ssh_user'               => 'vagrant',
+    'app_db_password'                => 'abc123',
+    'app_db_port'                    => 9191,
+    'app_db_username'                => 'user',
+    'app_environment'                => 'development',
+    'app_iam_access_key_id'          => 'abc123',
+    'app_iam_secret_access_key'      => 'abc123',
+    'app_instance_id'                => 'fake-development-instance-id',
+    'app_user_id'                    => 'fake-development-user-id',
+    'backup_notifier_mail_user_name' => 'email@example.com',
+    'backup_notifier_mail_password'  => 'abc123',
+    'mysql_root_password'            => 'abc123',
+    'vm_db_forwarded_port'           => 42001
+  }

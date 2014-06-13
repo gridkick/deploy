@@ -1,0 +1,18 @@
+---
+- name: install redis backup gem configuration
+  template: src=redis_backup.rb.j2 dest=~/Backup/models/redis_backup.rb
+
+- name: run backup to catch errors early (but don't wait for it to finish)
+  shell: bash -l -c 'backup perform -t redis_backup'
+  ignore_errors: yes
+  async: 600
+  poll: 0
+
+- name: install mongo backup gem configuration
+  template: src=mongo_backup.rb.j2 dest=~/Backup/models/mongo_backup.rb
+
+- name: run backup to catch errors early (but don't wait for it to finish)
+  shell: bash -l -c 'backup perform -t mongo_backup'
+  ignore_errors: yes
+  async: 600
+  poll: 0

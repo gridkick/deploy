@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+service = ARGV[ 0 ] or
+  raise ArgumentError.new( 'need to pass service name in as CLI argument' )
+
+root = File.expand_path File.join( File.dirname( __FILE__ ) , '..' )
+load "#{ root }/lib/app.rb"
+
+App.load_seeds!
+
+port        = App.seeds[ service ][ 'ansible_ssh_port' ]
+private_key = App.seeds[ service ][ 'ansible_ssh_private_key_file' ]
+user        = App.seeds[ service ][ 'ansible_ssh_user' ]
+
+to_run = <<CMD
+ssh \
+  #{ user }@127.0.0.1 \
+  -p #{ port } \
+  -o LogLevel=FATAL \
+  -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null \
+  -o IdentitiesOnly=yes \
+  -i #{ private_key }
+CMD
+
+exec to_run

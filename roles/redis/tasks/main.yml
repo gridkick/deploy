@@ -1,0 +1,93 @@
+---
+- name: update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
+
+- name: get redis source
+  get_url: url=http://download.redis.io/releases/redis-{{ redis.version }}.tar.gz 
+           dest=~/redis-{{ redis.version }}.tar.gz
+
+- name: untar and defeather redis
+  command: tar -xzf redis-{{ redis.version }}.tar.gz 
+           chdir=~ creates=/home/{{ ansible_ssh_user }}/redis-{{ redis.version }}
+
+- name: install build tools
+  sudo: yes
+  apt: pkg=build-essential state=present
+
+- name: build redis
+  command:  make 
+            chdir=/home/{{ ansible_ssh_user }}/redis-{{ redis.version }} 
+            creates=/home/{{ ansible_ssh_user }}/redis-{{ redis.version }}/src/redis-server
+
+- name: install tcl
+  sudo: yes
+  apt: pkg=tcl8.5 state=present
+  when: redis.test_build
+
+- name: test redis build
+  command:  make test 
+            chdir=/home/{{ ansible_ssh_user }}/redis-{{ redis.version }}
+  when: redis.test_build
+
+- name: stop redis-server
+  ignore_errors: true
+  action: service 
+          name=redis 
+          state=stopped 
+          enabled=yes
+
+- name: install redis
+  sudo: yes
+  command:  make install 
+            chdir=/home/{{ ansible_ssh_user }}/redis-{{ redis.version }} 
+            creates=/usr/local/bin/redis-server
+
+- name: create redis operation dirs
+  sudo: yes
+  file: path={{ item }} 
+        state=directory 
+        owner=root 
+        group=root
+  with_items:
+    - /etc/redis
+    - /var/lib/redis
+
+- name: place redis logfile
+  sudo: yes
+  copy: dest=/var/log/redis.log 
+        content="" 
+        force=no 
+        owner=root 
+        group=root
+
+- name: place redis config
+  sudo: yes
+  template: src=redis.conf.j2 
+            dest=/etc/redis/redis.conf 
+            owner=root 
+            group=root
+
+- name: place redis init script
+  sudo: yes
+  template: src=redis_init_script.j2 
+            dest=/etc/init.d/redis 
+            owner=root 
+            group=root
+            mode=0755
+
+- name: update redis runlevels
+  sudo: yes
+  command: update-rc.d redis defaults
+  
+- name: restart redis
+  sudo: yes
+  service: name=redis 
+           state=restarted 
+           enabled=yes
+           
+#  Firewall configs  ###########################################################
+
+- name: firewall | open port {{ redis.app_db_port }} in firewall
+  sudo: yes
+  command: ufw allow {{ redis.app_db_port }}

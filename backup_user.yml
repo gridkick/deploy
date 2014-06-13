@@ -1,0 +1,7 @@
+---
+- name: add sudo-password-less backup user
+  hosts: db-servers
+  gather_facts: no
+  sudo: yes
+  roles:
+    - backup_user

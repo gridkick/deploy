@@ -1,0 +1,8 @@
+---
+- name: add LC_ALL="en_US.utf8" to /etc/environment
+  sudo: yes
+  action: lineinfile
+          dest=/etc/environment
+          regexp="LC_ALL=.*"
+          line="LC_ALL=\"en_US.utf8\""
+  

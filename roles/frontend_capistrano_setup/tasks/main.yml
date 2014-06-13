@@ -1,0 +1,7 @@
+---
+- name: create expected capistrano dirs
+  sudo: yes
+  file: name=/var/www/adventure-frontend
+        state=directory
+        owner={{ ansible_ssh_user }}
+        group=root

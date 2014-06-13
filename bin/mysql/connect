@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+root = File.expand_path File.join( File.dirname( __FILE__ ) , '../..' )
+load "#{ root }/lib/app.rb"
+
+App.load_seeds!
+
+password = App.seeds[ 'mysql' ][ 'app_db_password' ]
+port     = App.seeds[ 'mysql' ][ 'vm_db_forwarded_port' ]
+user     = App.seeds[ 'mysql' ][ 'app_db_username' ]
+
+to_run = <<CMD
+mysql \
+  -h 127.0.0.1 \
+  -P #{ port } \
+  -u #{ user } \
+  --password=#{ password } \
+  --protocol=tcp
+CMD
+
+exec to_run

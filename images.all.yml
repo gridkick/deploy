@@ -1,0 +1,17 @@
+---
+- name: Image::All Server
+  hosts: services-all
+  user: ubuntu
+  vars_files:
+    - vars/postgresql.yml
+    - vars/redis.yml
+    - vars/secrets.yml
+  roles:
+    - common
+    - common_ssh_authorized_keys
+    - common_locale
+    - { role: postgresql, tags: ['postgres'] }
+    - { role: common_service_security, allow_port: "{{ postgresql.app_db_port }}" }
+    - redis
+    - { role: common_service_security, allow_port: "{{ redis.app_db_port }}" }
+    - backup_user ### still need the gridkickbackup user for Sidkiq-Ansible access
